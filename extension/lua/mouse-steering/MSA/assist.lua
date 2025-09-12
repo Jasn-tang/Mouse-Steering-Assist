@@ -5,7 +5,7 @@ local throttle = "W" --Key to press for throttle while scrolling mouse wheel. (a
 local brake = "S" --Key to press for brake while scrolling mouse wheel. (alphabet)
 local scroll = 0.02 --What percent will each scroll change. (number)
 local ffb = false --Do force feedback or not. (true/false)
-local ffbSens = 0.0005 -- How much will the "force" be. (number)
+local ffbSens = 0.0003 -- How much will the "force" be. (number)
 -------------------------------
 
 local gasFinal = 0
