@@ -1,6 +1,7 @@
 --Change script settings here--
 -------------------------------
 local smoothness = 0.25 -- How smooth will a change be. (number)
+local doffb = false --Do force feedback or not. (true/false)
 local ffbSens = 0.25 -- How much will the "force" be. (number)
 local scroll = 0.02 --What percent will each scroll change. (number)
 local throttle = "W" --Key to press for throttle while scrolling mouse wheel. (alphabet)
@@ -15,7 +16,8 @@ local steerFinal = 0
 
 function script.update(dt, deltaX)
     --Mouse Steering--
-    steerFinal = math.clamp(steerFinal + deltaX - ac.getCar(0).ffbFinal * ffbSens / 100, -1, 1)
+    steerFinal = math.clamp(steerFinal + deltaX, -1, 1)
+    if doffb then steerFinal = math.clamp(steerFinal - ac.getCar(0).ffbFinal * ffbSens / 100, -1, 1) end
 
     --Throttle Part--
     if ac.isControllerGasPressed() or ac.isKeyDown(ac.KeyIndex[throttle]) then
