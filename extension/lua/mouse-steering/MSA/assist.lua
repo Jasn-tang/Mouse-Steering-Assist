@@ -1,51 +1,38 @@
 --Change script settings here--
 -------------------------------
-local smoothness = 0.02 -- How smooth will a change be. (number)
+local smoothness = 0.25 -- How smooth will a change be. (number)
+local ffbSens = 0.25 -- How much will the "force" be. (number)
+local scroll = 0.02 --What percent will each scroll change. (number)
 local throttle = "W" --Key to press for throttle while scrolling mouse wheel. (alphabet)
 local brake = "S" --Key to press for brake while scrolling mouse wheel. (alphabet)
-local scroll = 0.02 --What percent will each scroll change. (number)
-local ffb = false --Do force feedback or not. (true/false)
-local ffbSens = 0.0005 -- How much will the "force" be. (number)
 -------------------------------
 
-local gasFinal = 0
-local brakeFinal = 0
-local steeringFinal = 0
+function ac.isControllerBrakePressed() end --To tell AC shut up bc this function doesn't exist in CSP 0.2.11 or below version.
+
+local isFirstGas, isFirstBrake = true, true
+local gasFinal, brakeFinal = 0, 0
+local steerFinal = 0
 
 function script.update(dt, deltaX)
     --Mouse Steering--
-    steeringFinal = math.clamp(steeringFinal + deltaX, -1, 1)
-    if ffb then
-        steeringFinal = steeringFinal - ac.getCar().ffbPure * ffbSens
-    end
-    
+    steerFinal = math.clamp(steerFinal + deltaX - ac.getCar(0).ffbFinal * ffbSens / 100, -1, 1)
+
     --Throttle Part--
-    if ac.isKeyDown(ac.KeyIndex[throttle]) and ac.isKeyDown(ac.KeyIndex.Shift) then
-        gasFinal = 1
-    elseif ac.isKeyPressed(ac.KeyIndex[throttle]) then gasFinal = 1 / 3
-    elseif ac.isKeyDown(ac.KeyIndex[throttle]) then
+    if ac.isControllerGasPressed() or ac.isKeyDown(ac.KeyIndex[throttle]) then
+        if isFirstGas then gasFinal, isFirstGas = 1 / 3, false end
+        if ac.isKeyDown(ac.KeyIndex.Shift) then gasFinal = 1 end
         gasFinal = math.clamp(gasFinal + ac.getUI().mouseWheel * scroll, 0, 1)
-    else gasFinal = math.max(ac.getCar().gas - dt / smoothness, 0)
-    end
+    else gasFinal, isFirstGas = 0, true end
 
     --Brake Part--
-    if ac.isKeyDown(ac.KeyIndex[brake]) and ac.isKeyDown(ac.KeyIndex.Shift) then
-        brakeFinal = 1
-    elseif ac.isKeyPressed(ac.KeyIndex[brake]) then brakeFinal = 1 / 3
-    elseif ac.isKeyDown(ac.KeyIndex[brake]) then
+    if ac.isControllerBrakePressed() or ac.isKeyDown(ac.KeyIndex[brake]) then
+        if isFirstBrake then brakeFinal, isFirstBrake = 1 / 3, false end
+        if ac.isKeyDown(ac.KeyIndex.Shift) then brakeFinal = 1 end
         brakeFinal = math.clamp(brakeFinal + ac.getUI().mouseWheel * scroll, 0, 1)
-    else brakeFinal = math.max(ac.getCar().brake - dt / smoothness, 0)
-    end
+    else brakeFinal, isFirstBrake = 0, true end
 
     --Output Part-
-    ac.getJoypadState().steer = steeringFinal
-    if ac.getCar().gas < gasFinal then
-        ac.getJoypadState().gas = math.min(ac.getCar().gas + dt / smoothness, gasFinal)
-    else ac.getJoypadState().gas = gasFinal end
-    if ac.getCar().brake < brakeFinal then
-        ac.getJoypadState().brake = math.min(ac.getCar().brake + dt / smoothness, brakeFinal)
-    else ac.getJoypadState().brake = brakeFinal end
-    ac.debug("gas", ac.getJoypadState().gas)
-    ac.debug("brake", ac.getJoypadState().brake)
-    ac.debug("steer", steeringFinal)
+    ac.getJoypadState().steer = steerFinal
+    ac.getJoypadState().gas = math.lerp(ac.getCar(0).gas, gasFinal, smoothness)
+    ac.getJoypadState().brake = math.lerp(ac.getCar(0).brake, brakeFinal, smoothness)
 end
