@@ -17,7 +17,7 @@ local steerFinal = 0
 function script.update(dt, deltaX)
     --Mouse Steering--
     steerFinal = math.clamp(steerFinal + deltaX, -1, 1)
-    if doffb then steerFinal = math.clamp(steerFinal - ac.getCar(0).ffbFinal * ffbSens / 100, -1, 1) end
+    if doffb then steerFinal = math.clamp(steerFinal - ac.getJoypadState().ffb * ffbSens / 100, -1, 1) end
 
     --Throttle Part--
     if ac.isControllerGasPressed() or ac.isKeyDown(ac.KeyIndex[throttle]) then
