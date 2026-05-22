@@ -4,8 +4,10 @@ local smoothness = 0.25 -- How smooth will a change be. (number)
 local doffb = false --Do force feedback or not. (true/false)
 local ffbSens = 0.25 -- How much will the "force" be. (number)
 local scroll = 0.02 --What percent will each scroll change. (number)
+local doScroll = true --Do mouse scrolling change throttle/gas. (true/false)
 local throttle = "W" --Key to press for throttle while scrolling mouse wheel. (alphabet)
 local brake = "S" --Key to press for brake while scrolling mouse wheel. (alphabet)
+local doForce = true --Force pedals to be 100% or not when shift key is pressed. (true/false)
 -------------------------------
 
 function ac.isControllerBrakePressed() end --To tell AC shut up bc this function doesn't exist in CSP 0.2.11 or below version.
@@ -22,15 +24,15 @@ function script.update(dt, deltaX)
     --Throttle Part--
     if ac.isControllerGasPressed() or ac.isKeyDown(ac.KeyIndex[throttle]) then
         if isFirstGas then gasFinal, isFirstGas = 1 / 3, false end
-        if ac.isKeyDown(ac.KeyIndex.Shift) then gasFinal = 1 end
-        gasFinal = math.clamp(gasFinal + ac.getUI().mouseWheel * scroll, 0, 1)
+        if ac.isKeyDown(ac.KeyIndex.Shift) and doForce then gasFinal = 1 end
+        if doScroll then gasFinal = math.clamp(gasFinal + ac.getUI().mouseWheel * scroll, 0, 1) end
     else gasFinal, isFirstGas = 0, true end
 
     --Brake Part--
     if ac.isControllerBrakePressed() or ac.isKeyDown(ac.KeyIndex[brake]) then
         if isFirstBrake then brakeFinal, isFirstBrake = 1 / 3, false end
-        if ac.isKeyDown(ac.KeyIndex.Shift) then brakeFinal = 1 end
-        brakeFinal = math.clamp(brakeFinal + ac.getUI().mouseWheel * scroll, 0, 1)
+        if ac.isKeyDown(ac.KeyIndex.Shift) and doForce then brakeFinal = 1 end
+        if doScroll then brakeFinal = math.clamp(brakeFinal + ac.getUI().mouseWheel * scroll, 0, 1) end
     else brakeFinal, isFirstBrake = 0, true end
 
     --Output Part-
