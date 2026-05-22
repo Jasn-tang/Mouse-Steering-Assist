@@ -16,6 +16,7 @@ local isFirstGas, isFirstBrake = true, true
 local gasFinal, brakeFinal = 0, 0
 local steerFinal = 0
 
+if doScroll then doScroll = 1 else doScroll = 0 end
 function script.update(dt, deltaX)
     --Mouse Steering--
     steerFinal = math.clamp(steerFinal + deltaX, -1, 1)
