@@ -18,7 +18,6 @@ local gasFinal, brakeFinal = 0, 0
 local steerFinal = 0
 local wheel, lastFrameScrolled = 0, 0
 
-
 function script.update(dt, deltaX)
     wheel = 0
     if ac.getUI().mouseWheel ~= 0 and lastFrameScrolled + 1 < ac.getSim().frame then lastFrameScrolled, wheel = ac.getSim().frame, ac.getUI().mouseWheel end
