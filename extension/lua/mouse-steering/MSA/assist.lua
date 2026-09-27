@@ -11,7 +11,7 @@ local cfg = ac.INIConfig.scriptSettings():mapSection('SETTINGS', {
     ONPRESS = 0.33
 })
 
-if not ac.isControllerBrakePressed() then function ac.isControllerBrakePressed() end end --To tell AC shut up bc this function doesn't exist in CSP 0.2.11 or below version.
+if ac.getPatchVersionCode() <= 3467 then function ac.isControllerBrakePressed() end end --To tell AC shut up bc this function doesn't exist in CSP 0.2.11 or below version.
 
 local isFirstGas, isFirstBrake = true, true
 local gasFinal, brakeFinal = 0, 0
