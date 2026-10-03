@@ -23,4 +23,4 @@ Force feedback is turned off by default.
 
 Please leave some suggestions or feedback through the DMs/discussion page of the script.
 A simple showcase video and installation tutorial:
-<video controls><source src="https://www.youtube.com/watch?v=WMi8wZirstY" type="video/mp4"></video>
+[<video controls><source src="https://www.youtube.com/watch?v=WMi8wZirstY" type="video/mp4"></video>](https://www.youtube.com/watch?v=WMi8wZirstY)
