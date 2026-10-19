@@ -1,4 +1,5 @@
 local cfg = ac.INIConfig.scriptSettings():mapSection('SETTINGS', {
+    STEERING_DEADZONE = 0.02,
     SMOOTHNESS = 0.25,
     DOFFB = false,
     FFBSENS = 0.25,
@@ -10,6 +11,16 @@ local cfg = ac.INIConfig.scriptSettings():mapSection('SETTINGS', {
     FORCEDAMOUNT = 1,
     ONPRESS = 0.33
 })
+
+-- Keep the accumulated axis unchanged: remap only the final steering output.
+local steeringDeadzone = math.clamp(cfg.STEERING_DEADZONE, 0, 0.1)
+local function applySteeringDeadzone(input)
+    if steeringDeadzone == 0 then return input end
+    local magnitude = math.abs(input)
+    if magnitude <= steeringDeadzone then return 0 end
+    local output = (magnitude - steeringDeadzone) / (1 - steeringDeadzone)
+    return input < 0 and -output or output
+end
 
 if ac.getPatchVersionCode() <= 3467 then function ac.isControllerBrakePressed() end end --To tell AC shut up bc this function doesn't exist in CSP 0.2.11 or below version.
 
@@ -41,7 +52,7 @@ function script.update(dt, deltaX)
     else brakeFinal, isFirstBrake = 0, true end
 
     --Output Part-
-    ac.getJoypadState().steer = steerFinal
+    ac.getJoypadState().steer = applySteeringDeadzone(steerFinal)
     ac.getJoypadState().gas = math.lerp(ac.getCar(0).gas, gasFinal, cfg.SMOOTHNESS)
     ac.getJoypadState().brake = math.lerp(ac.getCar(0).brake, brakeFinal, cfg.SMOOTHNESS)
 end
