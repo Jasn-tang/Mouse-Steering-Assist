@@ -1,6 +1,7 @@
 local cfg = ac.INIConfig.scriptSettings():mapSection('SETTINGS', {
     SMOOTHNESS = 0.25,
     DOFFB = false,
+    FFBMODE=0,
     FFBSENS = 0.25,
     SCROLL = 0.1,
     THROTTLE = 'W',
@@ -14,17 +15,23 @@ local cfg = ac.INIConfig.scriptSettings():mapSection('SETTINGS', {
 if ac.getPatchVersionCode() <= 3467 then function ac.isControllerBrakePressed() end end --To tell AC shut up bc this function doesn't exist in CSP 0.2.11 or below version.
 
 local isFirstGas, isFirstBrake = true, true
-local gasFinal, brakeFinal = 0, 0
-local steerFinal = 0
+local gasFinal, brakeFinal, steerFinal = 0, 0, 0
+local deltaX_ = 0
 local wheel, lastFrameScrolled = 0, 0
+
 
 function script.update(dt, deltaX)
     wheel = 0
     if ac.getUI().mouseWheel ~= 0 and lastFrameScrolled + 1 < ac.getSim().frame then lastFrameScrolled, wheel = ac.getSim().frame, ac.getUI().mouseWheel end
 
     --Mouse Steering--
-    steerFinal = math.clamp(steerFinal + deltaX, -1, 1)
-    if cfg.DOFFB then steerFinal = math.clamp(steerFinal - ac.getJoypadState().ffb * cfg.FFBSENS / 100, -1, 1) end
+    if cfg.DOFFB then
+        if cfg.FFBMODE == 0 or cfg.FFBMODE == 2 then steerFinal = steerFinal - ac.getJoypadState().ffb * cfg.FFBSENS / 100 end
+        if (cfg.FFBMODE == 1 or cfg.FFBMODE == 2) and deltaX * ac.getJoypadState().ffb > 0 then
+            deltaX_ = deltaX * math.exp(1) ^ - math.abs(ac.getJoypadState().ffb)
+        else deltaX_ = deltaX end
+    else deltaX_ = deltaX end
+    steerFinal = math.clamp(steerFinal + deltaX_, -1, 1)
 
     --Throttle Part--
     if ac.isControllerGasPressed() or ac.isKeyDown(ac.KeyIndex[cfg.THROTTLE]) or ac.isKeyDown(ac.KeyIndex[cfg.ALTTHROTTLE]) then
