@@ -24,3 +24,5 @@ Force feedback is turned off by default.
 Please leave some suggestions or feedback through the DMs/discussion page of the script.
 A simple showcase video and installation tutorial:
 https://www.youtube.com/watch?v=WMi8wZirstY
+
+Btw, you can fork however you can. Just please quote this repo and don't profit from it.
